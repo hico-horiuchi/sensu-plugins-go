@@ -18,7 +18,7 @@ func main() {
 	)
 
 	pflag.IntVarP(&warn, "warn", "w", 80, "WARN")
-	pflag.IntVarP(&crit, "crit", "c", 100, "CRIT")
+	pflag.IntVarP(&crit, "crit", "c", 90, "CRIT")
 	pflag.IntVarP(&sleep, "sleep", "s", 1, "SLEEP")
 	pflag.Parse()
 
