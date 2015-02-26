@@ -24,11 +24,11 @@ func main() {
 	usage := diskUsage()
 
 	for i := range usage {
-		use, _ := strconv.ParseInt(strings.TrimRight(usage[i][1], "%"), 10, 0)
+		cap, _ := strconv.ParseInt(strings.TrimRight(usage[i][1], "%"), 10, 0)
 		switch {
-		case use > int64(crit):
+		case cap > int64(crit):
 			critMnt = append(critMnt, usage[i][0]+" "+usage[i][1])
-		case use > int64(warn):
+		case cap > int64(warn):
 			warnMnt = append(warnMnt, usage[i][0]+" "+usage[i][1])
 		}
 	}
@@ -47,7 +47,7 @@ func main() {
 }
 
 func diskUsage() [][]string {
-	out, _ := exec.Command("df", "-l").Output()
+	out, _ := exec.Command("df", "-lP").Output()
 	lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")[1:]
 	result := make([][]string, len(lines))
 
