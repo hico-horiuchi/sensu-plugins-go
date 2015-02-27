@@ -26,14 +26,14 @@ func main() {
 	for _, host := range strings.Split(hosts, ",") {
 		wg.Add(1)
 
-		go func() {
+		go func(host string) {
 			before_traffic := snmpWalk(host, community)
 			time.Sleep(time.Second)
 			after_traffic := snmpWalk(host, community)
 
 			fmt.Printf("%s.snmp.traffic %d %d\n", host, after_traffic-before_traffic, now)
 			wg.Done()
-		}()
+		}(host)
 	}
 
 	wg.Wait()
