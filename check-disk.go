@@ -24,7 +24,7 @@ func main() {
 	usage := diskUsage()
 
 	for i := range usage {
-		cap, _ := strconv.ParseInt(strings.TrimRight(usage[i][1], "%"), 10, 0)
+		cap, _ := strconv.ParseInt(strings.TrimRight(usage[i][1], "%"), 10, 64)
 		switch {
 		case cap > int64(crit):
 			critMnt = append(critMnt, usage[i][0]+" "+usage[i][1])
