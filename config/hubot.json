@@ -1,0 +1,13 @@
+{
+  "hubot": {
+    "host": "localhost",
+    "port": 80,
+    "room": 1234
+  },
+  "handlers": {
+    "hubot": {
+      "type": "pipe",
+      "command": "/etc/sensu/handlers/handler-hubot"
+    }
+  }
+}
