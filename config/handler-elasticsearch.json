@@ -1,0 +1,13 @@
+{
+  "elasticsearch": {
+    "host": "localhost",
+    "port": 9200,
+    "index": "sensu-metrics"
+  },
+  "handlers": {
+    "elasticsearch": {
+      "type": "pipe",
+      "command": "/etc/sensu/handlers/handler-elasticsearch"
+    }
+  }
+}
