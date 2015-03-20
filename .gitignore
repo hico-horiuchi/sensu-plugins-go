@@ -1,2 +1,3 @@
 /bin/check-*
 /bin/metrics-*
+/bin/handler-*

@@ -1,4 +1,4 @@
-package sensu
+package plugin
 
 type clientStruct struct {
 	Name          string

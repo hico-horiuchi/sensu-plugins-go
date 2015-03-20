@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./sensu"
+	"./sensu/plugin"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
@@ -19,7 +19,7 @@ type metricsStruct struct {
 }
 
 func main() {
-	handler := sensu.NewHandler("/etc/sensu/conf.d/handler-elasticsearch.json")
+	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-elasticsearch.json")
 	lines := strings.Split(strings.TrimRight(handler.Event.Check.Output, "\n"), "\n")
 
 	for i := range lines {
@@ -49,7 +49,7 @@ func newMetrics(line string) metricsStruct {
 	return metrics
 }
 
-func createURL(event sensu.EventStruct, config simplejson.Json) string {
+func createURL(event plugin.EventStruct, config simplejson.Json) string {
 	host := config.GetPath("elasticsearch", "host").MustString()
 	port := config.GetPath("elasticsearch", "port").MustInt()
 	now := time.Now().Format("2006.01.02")

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./sensu"
+	"./sensu/plugin"
 	"encoding/json"
 	"fmt"
 	"github.com/bitly/go-simplejson"
@@ -18,7 +18,7 @@ type metricsStruct struct {
 }
 
 func main() {
-	handler := sensu.NewHandler("/etc/sensu/conf.d/handler-hubot.json")
+	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-hubot.json")
 
 	metrics := newMetrics(handler.Event)
 	body, _ := json.Marshal(metrics)
@@ -31,7 +31,7 @@ func main() {
 	http.DefaultClient.Do(request)
 }
 
-func newMetrics(event sensu.EventStruct) metricsStruct {
+func newMetrics(event plugin.EventStruct) metricsStruct {
 	metrics := metricsStruct{}
 
 	metrics.Client = event.Client.Name

@@ -1,4 +1,4 @@
-package sensu
+package plugin
 
 import (
 	"encoding/json"

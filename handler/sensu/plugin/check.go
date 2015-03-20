@@ -1,4 +1,4 @@
-package sensu
+package plugin
 
 type checkStruct struct {
 	Name        string
