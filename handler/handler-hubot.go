@@ -36,7 +36,7 @@ func newMetrics(event plugin.EventStruct) metricsStruct {
 
 	metrics.Client = event.Client.Name
 	metrics.Check = event.Check.Name
-	metrics.Output = event.Check.Output
+	metrics.Output = strings.TrimRight(event.Check.Output, "\n")
 	metrics.Status = event.Check.Status
 	metrics.Occurrences = event.Occurrences
 

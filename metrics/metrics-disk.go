@@ -27,8 +27,8 @@ func diskUsage() float64 {
 	var used float64 = 0.0
 	var available float64 = 0.0
 
-	for i := range lines {
-		stats := strings.Fields(lines[i])
+	for _, line := range lines {
+		stats := strings.Fields(line)
 		used += ParseFloat(stats[2])
 		available += ParseFloat(stats[3])
 	}

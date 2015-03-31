@@ -22,8 +22,8 @@ func main() {
 	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-elasticsearch.json")
 	lines := strings.Split(strings.TrimRight(handler.Event.Check.Output, "\n"), "\n")
 
-	for i := range lines {
-		metrics := newMetrics(lines[i])
+	for _, line := range lines {
+		metrics := newMetrics(line)
 		body, _ := json.Marshal(metrics)
 		payload := strings.NewReader(string(body))
 
