@@ -54,7 +54,12 @@ func cpuUsage(sleep int) float64 {
 }
 
 func getStats() []float64 {
-	contents, _ := ioutil.ReadFile("/proc/stat")
+	contents, err := ioutil.ReadFile("/proc/stat")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
+
 	line := strings.Split(string(contents), "\n")[0]
 	stats := strings.Fields(line)[1:11]
 

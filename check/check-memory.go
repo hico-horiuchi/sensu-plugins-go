@@ -35,9 +35,13 @@ func main() {
 }
 
 func memoryUsage() float64 {
-	out, _ := exec.Command("free").Output()
-	lines := strings.Split(string(out), "\n")
+	out, err := exec.Command("free").Output()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
+	}
 
+	lines := strings.Split(string(out), "\n")
 	total, _ := strconv.ParseFloat(strings.Fields(lines[1])[1], 64)
 	free, _ := strconv.ParseFloat(strings.Fields(lines[2])[3], 64)
 

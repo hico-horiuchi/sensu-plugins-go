@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-const RequestError int = -1
-
 func main() {
 	var (
 		url      string
@@ -22,9 +20,6 @@ func main() {
 	status := getStatusCode(url)
 
 	switch {
-	case status == RequestError:
-		fmt.Printf("CheckHTTP CRITICAL: Request Error\n")
-		os.Exit(2)
 	case status >= 400:
 		fmt.Printf("CheckHTTP CRITICAL: %d\n", status)
 		os.Exit(2)
@@ -42,11 +37,12 @@ func main() {
 
 func getStatusCode(url string) int {
 	request, _ := http.NewRequest("GET", url, nil)
-	response, _ := http.DefaultTransport.RoundTrip(request)
+	response, err := http.DefaultTransport.RoundTrip(request)
 
-	if response == nil {
-		return RequestError
-	} else {
-		return response.StatusCode
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(2)
 	}
+
+	return response.StatusCode
 }
