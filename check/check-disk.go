@@ -47,12 +47,7 @@ func main() {
 }
 
 func diskUsage() [][]string {
-	out, err := exec.Command("df", "-lP").Output()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
-	}
-
+	out, _ := exec.Command("df", "-lP").Output()
 	lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")[1:]
 	result := make([][]string, len(lines))
 
