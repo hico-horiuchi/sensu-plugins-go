@@ -40,7 +40,7 @@ func getStatusCode(url string) int {
 	response, err := http.DefaultTransport.RoundTrip(request)
 
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("CheckHTTP CRITICAL:", err)
 		os.Exit(2)
 	}
 

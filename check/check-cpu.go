@@ -56,7 +56,7 @@ func cpuUsage(sleep int) float64 {
 func getStats() []float64 {
 	contents, err := ioutil.ReadFile("/proc/stat")
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("CheckCPU CRITICAL:", err)
 		os.Exit(2)
 	}
 
