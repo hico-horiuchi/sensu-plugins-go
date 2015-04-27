@@ -1,0 +1,19 @@
+{
+  "delete": {
+    "status": 1,
+    "subscriptions": [
+      "virtual",
+      "container"
+    ],
+    "host": "127.0.0.1",
+    "port": 4567,
+    "user": "",
+    "password": ""
+  },
+  "handlers": {
+    "delete": {
+      "type": "pipe",
+      "command": "/etc/sensu/handlers/handler-delete"
+    }
+  }
+}
