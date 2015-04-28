@@ -27,11 +27,12 @@ func main() {
 		wg.Add(1)
 
 		go func(host string) {
-			before_traffic := snmpWalk(host, community)
+			beforeTraffics := snmpWalk(host, community)
 			time.Sleep(time.Second)
-			after_traffic := snmpWalk(host, community)
+			afterTraffics := snmpWalk(host, community)
 
-			fmt.Printf("%s.snmp.traffic %d %d\n", host, after_traffic-before_traffic, now)
+			fmt.Printf("%s.snmp.rx_bytes %d %d\n", host, afterTraffics[0]-beforeTraffics[0], now)
+			fmt.Printf("%s.snmp.tx_bytes %d %d\n", host, afterTraffics[1]-beforeTraffics[1], now)
 			wg.Done()
 		}(host)
 	}
@@ -39,17 +40,19 @@ func main() {
 	wg.Wait()
 }
 
-func snmpWalk(host string, community string) int64 {
-	out, _ := exec.Command("snmpwalk", "-v", "2c", "-c", community, host, "1.3.6.1.2.1.2.2.1.10").Output()
-	lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")
+func snmpWalk(host string, community string) []int64 {
+	traffics := make([]int64, 2)
 
-	var traffic int64 = 0
+	for i, oid := range []string{"1.3.6.1.2.1.2.2.1.10", "1.3.6.1.2.1.2.2.1.16"} {
+		out, _ := exec.Command("snmpwalk", "-v", "2c", "-c", community, host, oid).Output()
+		lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")
 
-	for _, line := range lines {
-		traffic += ParseInt(strings.Fields(line)[3])
+		for _, line := range lines {
+			traffics[i] += ParseInt(strings.Fields(line)[3])
+		}
 	}
 
-	return traffic
+	return traffics
 }
 
 func ParseInt(s string) int64 {
