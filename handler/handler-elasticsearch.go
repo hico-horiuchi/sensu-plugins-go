@@ -54,11 +54,11 @@ func createURL(event plugin.EventStruct, config simplejson.Json) string {
 	port := config.GetPath("elasticsearch", "port").MustInt()
 	now := time.Now().Format("2006.01.02")
 
-	es_index := config.GetPath("elasticsearch", "index").MustString()
-	es_type := event.Check.Name
-	es_id := createID()
+	esIndex := config.GetPath("elasticsearch", "index").MustString()
+	esType := event.Check.Name
+	esId := createID()
 
-	return fmt.Sprintf("http://%s:%d/%s-%s/%s/%x", host, port, es_index, now, es_type, es_id)
+	return fmt.Sprintf("http://%s:%d/%s-%s/%s/%x", host, port, esIndex, now, esType, esId)
 }
 
 func createID() []byte {

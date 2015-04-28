@@ -27,13 +27,13 @@ func main() {
 }
 
 func trafficsBytes(sleep int) []int64 {
-	before_traffics := getTraffics()
+	beforeTraffics := getTraffics()
 	time.Sleep(time.Duration(sleep) * time.Second)
-	after_traffics := getTraffics()
+	afterTraffics := getTraffics()
 
 	return []int64{
-		after_traffics[0] - before_traffics[0],
-		after_traffics[1] - before_traffics[1],
+		afterTraffics[0] - beforeTraffics[0],
+		afterTraffics[1] - beforeTraffics[1],
 	}
 }
 

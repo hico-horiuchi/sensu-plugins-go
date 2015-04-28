@@ -38,19 +38,19 @@ func main() {
 }
 
 func cpuUsage(sleep int) float64 {
-	before_stats := getStats()
+	beforeStats := getStats()
 	time.Sleep(time.Duration(sleep) * time.Second)
-	after_stats := getStats()
+	afterStats := getStats()
 
-	diff_stats := make([]float64, len(before_stats))
-	var total_diff float64 = 0.0
+	diffStats := make([]float64, len(beforeStats))
+	var totalDiff float64 = 0.0
 
-	for i := range before_stats {
-		diff_stats[i] = after_stats[i] - before_stats[i]
-		total_diff += diff_stats[i]
+	for i := range beforeStats {
+		diffStats[i] = afterStats[i] - beforeStats[i]
+		totalDiff += diffStats[i]
 	}
 
-	return 100.0 * (total_diff - diff_stats[3]) / total_diff
+	return 100.0 * (totalDiff - diffStats[3]) / totalDiff
 }
 
 func getStats() []float64 {
