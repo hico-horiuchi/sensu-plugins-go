@@ -19,19 +19,26 @@ func main() {
 	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
 	pflag.Parse()
 
-	fmt.Printf("%s.traffic.bytes %d %d\n", scheme, trafficBytes(1), time.Now().Unix())
+	traffics := trafficsBytes(1)
+	now := time.Now().Unix()
+
+	fmt.Printf("%s.traffic.rx_bytes %d %d\n", scheme, traffics[0], now)
+	fmt.Printf("%s.traffic.tx_bytes %d %d\n", scheme, traffics[1], now)
 }
 
-func trafficBytes(sleep int) int64 {
-	before_traffic := getTraffic()
+func trafficsBytes(sleep int) []int64 {
+	before_traffics := getTraffics()
 	time.Sleep(time.Duration(sleep) * time.Second)
-	after_traffic := getTraffic()
+	after_traffics := getTraffics()
 
-	return after_traffic - before_traffic
+	return []int64{
+		after_traffics[0] - before_traffics[0],
+		after_traffics[1] - before_traffics[1],
+	}
 }
 
-func getTraffic() int64 {
-	var traffic int64 = 0
+func getTraffics() []int64 {
+	traffics := make([]int64, 2)
 	ifpaths, _ := filepath.Glob("/sys/class/net/*")
 
 	for _, ifpath := range ifpaths {
@@ -42,14 +49,14 @@ func getTraffic() int64 {
 			continue
 		}
 
-		txBytes, _ := ioutil.ReadFile(ifpath + "/statistics/tx_bytes")
-		traffic += ParseInt(strings.TrimRight(string(txBytes), "\n"))
-
 		rxBytes, _ := ioutil.ReadFile(ifpath + "/statistics/rx_bytes")
-		traffic += ParseInt(strings.TrimRight(string(rxBytes), "\n"))
+		traffics[0] = ParseInt(strings.TrimRight(string(rxBytes), "\n"))
+
+		txBytes, _ := ioutil.ReadFile(ifpath + "/statistics/tx_bytes")
+		traffics[1] = ParseInt(strings.TrimRight(string(txBytes), "\n"))
 	}
 
-	return traffic
+	return traffics
 }
 
 func ParseInt(s string) int64 {
