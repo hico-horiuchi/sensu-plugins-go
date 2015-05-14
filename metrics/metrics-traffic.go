@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"io/ioutil"
 	"os"
 	"path"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/pflag"
 )
 
 func main() {

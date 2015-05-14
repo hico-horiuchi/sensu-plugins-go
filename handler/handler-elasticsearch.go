@@ -1,15 +1,16 @@
 package main
 
 import (
-	"./sensu/plugin"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/bitly/go-simplejson"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"./sensu/plugin"
+	"github.com/bitly/go-simplejson"
 )
 
 type metricsStruct struct {

@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"os/exec"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/spf13/pflag"
 )
 
 func main() {

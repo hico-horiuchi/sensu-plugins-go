@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/pflag"
 )
 
 func main() {
@@ -39,7 +40,7 @@ func cpuUsage(sleep int) float64 {
 func getStats() []float64 {
 	contents, _ := ioutil.ReadFile("/proc/stat")
 	line := strings.Split(string(contents), "\n")[0]
-	stats := strings.Fields(line)[1:11]
+	stats := strings.Fields(line)[1:]
 
 	result := make([]float64, len(stats))
 	for i := range stats {

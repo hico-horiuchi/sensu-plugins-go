@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/spf13/pflag"
 )
 
 func main() {
@@ -61,7 +62,7 @@ func getStats() []float64 {
 	}
 
 	line := strings.Split(string(contents), "\n")[0]
-	stats := strings.Fields(line)[1:11]
+	stats := strings.Fields(line)[1:]
 
 	result := make([]float64, len(stats))
 	for i := range stats {

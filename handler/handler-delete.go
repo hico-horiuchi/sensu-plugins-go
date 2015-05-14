@@ -1,10 +1,11 @@
 package main
 
 import (
-	"./sensu/plugin"
 	"net/http"
 	"sort"
 	"strconv"
+
+	"./sensu/plugin"
 )
 
 func main() {

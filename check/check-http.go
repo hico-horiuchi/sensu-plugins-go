@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"net/http"
 	"os"
+
+	"github.com/spf13/pflag"
 )
 
 func main() {

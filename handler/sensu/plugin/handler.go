@@ -2,10 +2,11 @@ package plugin
 
 import (
 	"encoding/json"
-	"github.com/bitly/go-simplejson"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/bitly/go-simplejson"
 )
 
 type handlerStruct struct {

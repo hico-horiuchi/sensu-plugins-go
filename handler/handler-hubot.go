@@ -1,12 +1,13 @@
 package main
 
 import (
-	"./sensu/plugin"
 	"encoding/json"
 	"fmt"
-	"github.com/bitly/go-simplejson"
 	"net/http"
 	"strings"
+
+	"./sensu/plugin"
+	"github.com/bitly/go-simplejson"
 )
 
 type metricsStruct struct {
