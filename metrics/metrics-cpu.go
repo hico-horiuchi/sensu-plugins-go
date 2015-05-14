@@ -13,7 +13,8 @@ import (
 
 func main() {
 	var scheme string
-	hostname, _ := os.Hostname()
+	fqdn, _ := os.Hostname()
+	hostname := strings.Split(fqdn, ".")[0]
 
 	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
 	pflag.Parse()
