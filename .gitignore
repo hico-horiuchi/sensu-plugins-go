@@ -1,3 +1,9 @@
+*~
+.*.swp
+*#*
+.DS_Store
+/_vendor
+/.vendor
 /bin/check-*
 /bin/metrics-*
 /bin/handler-*

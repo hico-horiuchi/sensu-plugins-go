@@ -1,0 +1,6 @@
+gom 'github.com/spf13/pflag'
+gom 'github.com/bitly/go-simplejson'
+
+group :development do
+  gom 'golang.org/x/tools/cmd/goimports'
+end
