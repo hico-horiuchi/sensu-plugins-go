@@ -33,13 +33,13 @@ func main() {
 
 	switch status {
 	case "green":
-		fmt.Printf("CheckElasticsearch OK: Cluster is green\n")
+		fmt.Println("CheckElasticsearch OK: Cluster is green")
 		os.Exit(0)
 	case "yellow":
-		fmt.Printf("CheckElasticsearch WARNING: Cluster is yellow\n")
+		fmt.Println("CheckElasticsearch WARNING: Cluster is yellow")
 		os.Exit(1)
 	case "red":
-		fmt.Printf("CheckElasticsearch CRITICAL: Cluster is red\n")
+		fmt.Println("CheckElasticsearch CRITICAL: Cluster is red")
 		os.Exit(2)
 	}
 }
