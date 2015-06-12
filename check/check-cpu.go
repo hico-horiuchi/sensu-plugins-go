@@ -26,10 +26,10 @@ func main() {
 	usage := cpuUsage(sleep)
 
 	switch {
-	case usage > float64(crit):
+	case usage >= float64(crit):
 		fmt.Printf("CheckCPU CRITICAL: %.0f%%\n", usage)
 		os.Exit(2)
-	case usage > float64(warn):
+	case usage >= float64(warn):
 		fmt.Printf("CheckCPU WARNING: %.0f%%\n", usage)
 		os.Exit(1)
 	default:

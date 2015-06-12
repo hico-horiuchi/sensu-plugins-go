@@ -27,9 +27,9 @@ func main() {
 	for _, u := range usage {
 		cap, _ := strconv.ParseInt(strings.TrimRight(u[1], "%"), 10, 64)
 		switch {
-		case cap > int64(crit):
+		case cap >= int64(crit):
 			critMnt = append(critMnt, u[0]+" "+u[1])
-		case cap > int64(warn):
+		case cap >= int64(warn):
 			warnMnt = append(warnMnt, u[0]+" "+u[1])
 		}
 	}

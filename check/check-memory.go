@@ -23,10 +23,10 @@ func main() {
 	usage := memoryUsage()
 
 	switch {
-	case usage > float64(crit):
+	case usage >= float64(crit):
 		fmt.Printf("CheckMemory CRITICAL: %.0f%%\n", usage)
 		os.Exit(2)
-	case usage > float64(warn):
+	case usage >= float64(warn):
 		fmt.Printf("CheckMemory WARNING: %.0f%%\n", usage)
 		os.Exit(1)
 	default:
