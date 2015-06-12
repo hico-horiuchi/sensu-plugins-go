@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/spf13/pflag"
 )
@@ -12,13 +13,15 @@ func main() {
 	var (
 		url      string
 		redirect bool
+		timeout  int
 	)
 
 	pflag.StringVarP(&url, "url", "u", "http://localhost/", "URL")
 	pflag.BoolVarP(&redirect, "redirect", "r", false, "REDIRECT")
+	pflag.IntVarP(&timeout, "timeout", "t", 15, "TIMEOUT")
 	pflag.Parse()
 
-	status := getStatusCode(url)
+	status := getStatusCode(url, timeout)
 
 	switch {
 	case status >= 400:
@@ -36,7 +39,8 @@ func main() {
 	}
 }
 
-func getStatusCode(url string) int {
+func getStatusCode(url string, timeout int) int {
+	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 	request, _ := http.NewRequest("GET", url, nil)
 	response, err := http.DefaultTransport.RoundTrip(request)
 
