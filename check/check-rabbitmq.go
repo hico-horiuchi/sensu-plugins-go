@@ -41,7 +41,7 @@ func main() {
 	case "ok":
 		fmt.Println("CheckRabbitMQ OK: RabbitMQ server is alive")
 		os.Exit(0)
-	case "":
+	default:
 		fmt.Println("CheckRabbitMQ WARNING: Object Not Found")
 		os.Exit(1)
 	}
