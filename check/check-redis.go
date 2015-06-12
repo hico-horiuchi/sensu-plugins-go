@@ -25,7 +25,7 @@ func main() {
 	pflag.StringVarP(&value, "value", "v", "master", "VALUE")
 	pflag.Parse()
 
-	info := getInfo(host, port, key)
+	info := redisInfo(host, port, key)
 	if info == value {
 		fmt.Printf("CheckRedis OK: Redis %s is %s\n", key, info)
 		os.Exit(0)
@@ -35,7 +35,7 @@ func main() {
 	}
 }
 
-func getInfo(host string, port int, key string) string {
+func redisInfo(host string, port int, key string) string {
 	var info string
 
 	client, err := redis.Dial("tcp", host+":"+strconv.Itoa(port))

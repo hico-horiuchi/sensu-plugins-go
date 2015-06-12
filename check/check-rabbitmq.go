@@ -35,7 +35,7 @@ func main() {
 	pflag.IntVarP(&timeout, "timeout", "t", 10, "TIMEOUT")
 	pflag.Parse()
 
-	status := getAlivenessTest(host, port, vhost, user, password, timeout)
+	status := alivenessTest(host, port, vhost, user, password, timeout)
 
 	switch status {
 	case "ok":
@@ -47,7 +47,7 @@ func main() {
 	}
 }
 
-func getAlivenessTest(host string, port int, vhost string, user string, password string, timeout int) string {
+func alivenessTest(host string, port int, vhost string, user string, password string, timeout int) string {
 	var aliveness alivenessStruct
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 

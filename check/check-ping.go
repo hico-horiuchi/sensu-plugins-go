@@ -29,7 +29,7 @@ func main() {
 		fmt.Println("CheckPing CRITICAL:", err)
 		os.Exit(2)
 	}
-
 	defer conn.Close()
+
 	fmt.Printf("CheckPing OK: %s\n", address)
 }

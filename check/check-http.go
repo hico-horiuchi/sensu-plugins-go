@@ -21,7 +21,7 @@ func main() {
 	pflag.IntVarP(&timeout, "timeout", "t", 15, "TIMEOUT")
 	pflag.Parse()
 
-	status := getStatusCode(url, timeout)
+	status := statusCode(url, timeout)
 
 	switch {
 	case status >= 400:
@@ -39,7 +39,7 @@ func main() {
 	}
 }
 
-func getStatusCode(url string, timeout int) int {
+func statusCode(url string, timeout int) int {
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 
 	request, _ := http.NewRequest("GET", url, nil)

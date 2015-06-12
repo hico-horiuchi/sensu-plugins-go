@@ -28,7 +28,7 @@ func main() {
 	pflag.IntVarP(&timeout, "timeout", "t", 30, "TIMEOUT")
 	pflag.Parse()
 
-	status := getHealthStatus(host, port, timeout)
+	status := healthStatus(host, port, timeout)
 
 	switch status {
 	case "green":
@@ -43,7 +43,7 @@ func main() {
 	}
 }
 
-func getHealthStatus(host string, port int, timeout int) string {
+func healthStatus(host string, port int, timeout int) string {
 	var health healthStruct
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 
