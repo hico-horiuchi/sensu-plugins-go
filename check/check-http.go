@@ -41,6 +41,7 @@ func main() {
 
 func getStatusCode(url string, timeout int) int {
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
+
 	request, _ := http.NewRequest("GET", url, nil)
 	response, err := http.DefaultTransport.RoundTrip(request)
 

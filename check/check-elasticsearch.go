@@ -28,8 +28,7 @@ func main() {
 	pflag.IntVarP(&timeout, "timeout", "t", 30, "TIMEOUT")
 	pflag.Parse()
 
-	url := "http://" + host + ":" + strconv.Itoa(port) + "/_cluster/health"
-	status := getHealthStatus(url, timeout)
+	status := getHealthStatus(host, port, timeout)
 
 	switch status {
 	case "green":
@@ -44,10 +43,11 @@ func main() {
 	}
 }
 
-func getHealthStatus(url string, timeout int) string {
+func getHealthStatus(host string, port int, timeout int) string {
 	var health healthStruct
-
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
+
+	url := "http://" + host + ":" + strconv.Itoa(port) + "/_cluster/health"
 	request, _ := http.NewRequest("GET", url, nil)
 	response, err := http.DefaultClient.Do(request)
 
