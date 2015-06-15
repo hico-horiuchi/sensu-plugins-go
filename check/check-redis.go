@@ -52,9 +52,9 @@ func redisInfo(host string, port int, key string) string {
 	}
 
 	re := regexp.MustCompile(key + ":(.+)")
-	match := re.FindAllStringSubmatch(result, -1)
+	match := re.FindStringSubmatch(result)
 	if len(match) > 0 {
-		info = strings.TrimRight(match[0][1], "\r")
+		info = strings.TrimRight(match[1], "\r")
 	}
 
 	return info
