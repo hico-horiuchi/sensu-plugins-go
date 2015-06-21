@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strconv"
 
-	"../sensu-plugin/handler"
+	"../lib/handler"
 )
 
 func main() {

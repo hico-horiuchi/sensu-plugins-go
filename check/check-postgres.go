@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 	_ "github.com/lib/pq"
 )
 

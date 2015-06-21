@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"../sensu-plugin/handler"
+	"../lib/handler"
 )
 
 type metricsStruct struct {

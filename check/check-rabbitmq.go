@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 )
 
 type alivenessStruct struct {

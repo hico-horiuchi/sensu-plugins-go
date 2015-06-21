@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 )
 
 func main() {

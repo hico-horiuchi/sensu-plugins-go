@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 	"github.com/garyburd/redigo/redis"
 )
 

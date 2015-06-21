@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"../sensu-plugin/check"
+	"../lib/check"
 )
 
 type healthStruct struct {

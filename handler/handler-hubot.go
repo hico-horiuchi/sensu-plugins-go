@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"../sensu-plugin/handler"
+	"../lib/handler"
 )
 
 type metricsStruct struct {
