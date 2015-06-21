@@ -9,7 +9,7 @@ run:
 	gom run main.go ${ARGS}
 
 fmt:
-	gom exec goimports -w check/*.go metrics/*.go handler/*.go
+	@$(foreach FILE, $(SOURCES), gom exec goimports -w $(FILE);)
 
 build: fmt $(SOURCES)
 	@$(foreach FILE, $(SOURCES), echo $(FILE); gom build $(BUILDOPT) -o bin/`basename $(FILE) .go` $(FILE);)
