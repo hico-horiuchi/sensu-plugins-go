@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"../sensu-plugin/check"
 	"github.com/garyburd/redigo/redis"
-	"github.com/spf13/pflag"
 )
 
 func main() {
@@ -19,36 +18,37 @@ func main() {
 		value string
 	)
 
-	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "P", 6379, "PORT")
-	pflag.StringVarP(&key, "key", "k", "role", "KEY")
-	pflag.StringVarP(&value, "value", "v", "master", "VALUE")
-	pflag.Parse()
+	c := check.New("CheckRedis")
+	c.Option.StringVarP(&host, "host", "h", "localhost", "HOST")
+	c.Option.IntVarP(&port, "port", "P", 6379, "PORT")
+	c.Option.StringVarP(&key, "key", "k", "role", "KEY")
+	c.Option.StringVarP(&value, "value", "v", "master", "VALUE")
+	c.Init()
 
-	info := redisInfo(host, port, key)
+	info, err := redisInfo(host, port, key)
+	if err != nil {
+		c.Error(err)
+	}
+
 	if info == value {
-		fmt.Printf("CheckRedis OK: Redis %s is %s\n", key, info)
-		os.Exit(0)
+		c.Ok(fmt.Sprintf("Redis %s is %s", key, info))
 	} else {
-		fmt.Printf("CheckRedis CRITICAL: Redis %s is %s\n", key, info)
-		os.Exit(2)
+		c.Warning(fmt.Sprintf("Redis %s is %s", key, info))
 	}
 }
 
-func redisInfo(host string, port int, key string) string {
+func redisInfo(host string, port int, key string) (string, error) {
 	var info string
 
 	client, err := redis.Dial("tcp", host+":"+strconv.Itoa(port))
 	if err != nil {
-		fmt.Println("CheckRedis CRITICAL:", err)
-		os.Exit(2)
+		return info, err
 	}
 	defer client.Close()
 
 	result, err := redis.String(client.Do("INFO"))
 	if err != nil {
-		fmt.Println("CheckRedis CRITICAL:", err)
-		os.Exit(2)
+		return info, err
 	}
 
 	re := regexp.MustCompile(key + ":(.+)")
@@ -57,5 +57,5 @@ func redisInfo(host string, port int, key string) string {
 		info = strings.TrimRight(match[1], "\r")
 	}
 
-	return info
+	return info, nil
 }

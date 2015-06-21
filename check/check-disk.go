@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/pflag"
+	"../sensu-plugin/check"
 )
 
 func main() {
@@ -18,14 +16,22 @@ func main() {
 		critMnt []string
 	)
 
-	pflag.IntVarP(&warn, "warn", "w", 80, "WARN")
-	pflag.IntVarP(&crit, "crit", "c", 100, "CRIT")
-	pflag.Parse()
+	c := check.New("CheckDisk")
+	c.Option.IntVarP(&warn, "warn", "w", 80, "WARN")
+	c.Option.IntVarP(&crit, "crit", "c", 100, "CRIT")
+	c.Init()
 
-	usage := diskUsage()
+	usage, err := diskUsage()
+	if err != nil {
+		c.Error(err)
+	}
 
 	for _, u := range usage {
-		cap, _ := strconv.ParseInt(strings.TrimRight(u[1], "%"), 10, 64)
+		cap, err := strconv.ParseInt(strings.TrimRight(u[1], "%"), 10, 64)
+		if err != nil {
+			c.Error(err)
+		}
+
 		switch {
 		case cap >= int64(crit):
 			critMnt = append(critMnt, u[0]+" "+u[1])
@@ -36,19 +42,20 @@ func main() {
 
 	switch {
 	case len(critMnt) > 0:
-		fmt.Printf("CheckDisk CRITICAL: %s\n", strings.Join(critMnt, ", "))
-		os.Exit(2)
+		c.Critical(strings.Join(critMnt, ", "))
 	case len(warnMnt) > 0:
-		fmt.Printf("CheckDisk WARNING: %s\n", strings.Join(warnMnt, ", "))
-		os.Exit(1)
+		c.Warning(strings.Join(warnMnt, ", "))
 	default:
-		fmt.Printf("CheckDisk OK\n")
-		os.Exit(0)
+		c.Ok("OK")
 	}
 }
 
-func diskUsage() [][]string {
-	out, _ := exec.Command("df", "-lP").Output()
+func diskUsage() ([][]string, error) {
+	out, err := exec.Command("df", "-lP").Output()
+	if err != nil {
+		return [][]string{}, err
+	}
+
 	lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")[1:]
 	result := make([][]string, len(lines))
 
@@ -57,5 +64,5 @@ func diskUsage() [][]string {
 		result[i] = []string{stats[5], stats[4]}
 	}
 
-	return result
+	return result, nil
 }

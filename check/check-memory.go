@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 
-	"github.com/spf13/pflag"
+	"../sensu-plugin/check"
 )
 
 func main() {
@@ -16,35 +15,43 @@ func main() {
 		crit int
 	)
 
-	pflag.IntVarP(&warn, "warn", "w", 80, "WARN")
-	pflag.IntVarP(&crit, "crit", "c", 90, "CRIT")
-	pflag.Parse()
+	c := check.New("CheckMemory")
+	c.Option.IntVarP(&warn, "warn", "w", 80, "WARN")
+	c.Option.IntVarP(&crit, "crit", "c", 90, "CRIT")
+	c.Init()
 
-	usage := memoryUsage()
+	usage, err := memoryUsage()
+	if err != nil {
+		c.Error(err)
+	}
 
 	switch {
 	case usage >= float64(crit):
-		fmt.Printf("CheckMemory CRITICAL: %.0f%%\n", usage)
-		os.Exit(2)
+		c.Critical(fmt.Sprintf("%.0f%%", usage))
 	case usage >= float64(warn):
-		fmt.Printf("CheckMemory WARNING: %.0f%%\n", usage)
-		os.Exit(1)
+		c.Warning(fmt.Sprintf("%.0f%%", usage))
 	default:
-		fmt.Printf("CheckMemory OK: %.0f%%\n", usage)
-		os.Exit(0)
+		c.Ok(fmt.Sprintf("%.0f%%", usage))
 	}
 }
 
-func memoryUsage() float64 {
+func memoryUsage() (float64, error) {
 	out, err := exec.Command("free").Output()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(2)
+		return 0.0, err
 	}
 
 	lines := strings.Split(string(out), "\n")
-	total, _ := strconv.ParseFloat(strings.Fields(lines[1])[1], 64)
-	free, _ := strconv.ParseFloat(strings.Fields(lines[2])[3], 64)
 
-	return 100.0 - (100.0 * free / total)
+	total, err := strconv.ParseFloat(strings.Fields(lines[1])[1], 64)
+	if err != nil {
+		return 0.0, err
+	}
+
+	free, err := strconv.ParseFloat(strings.Fields(lines[2])[3], 64)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return 100.0 - (100.0 * free / total), nil
 }

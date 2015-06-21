@@ -2,15 +2,13 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"time"
 
-	"github.com/spf13/pflag"
+	"../sensu-plugin/check"
 )
 
 type alivenessStruct struct {
@@ -27,27 +25,29 @@ func main() {
 		timeout  int
 	)
 
-	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "P", 15672, "PORT")
-	pflag.StringVarP(&vhost, "vhost", "v", "%2F", "VHOST")
-	pflag.StringVarP(&user, "user", "u", "guest", "USER")
-	pflag.StringVarP(&password, "password", "p", "guest", "PASSWORD")
-	pflag.IntVarP(&timeout, "timeout", "t", 10, "TIMEOUT")
-	pflag.Parse()
+	c := check.New("CheckRabbitMQ")
+	c.Option.StringVarP(&host, "host", "h", "localhost", "HOST")
+	c.Option.IntVarP(&port, "port", "P", 15672, "PORT")
+	c.Option.StringVarP(&vhost, "vhost", "v", "%2F", "VHOST")
+	c.Option.StringVarP(&user, "user", "u", "guest", "USER")
+	c.Option.StringVarP(&password, "password", "p", "guest", "PASSWORD")
+	c.Option.IntVarP(&timeout, "timeout", "t", 10, "TIMEOUT")
+	c.Init()
 
-	status := alivenessTest(host, port, vhost, user, password, timeout)
+	status, err := alivenessTest(host, port, vhost, user, password, timeout)
+	if err != nil {
+		c.Error(err)
+	}
 
 	switch status {
 	case "ok":
-		fmt.Println("CheckRabbitMQ OK: RabbitMQ server is alive")
-		os.Exit(0)
+		c.Ok("RabbitMQ server is alive")
 	default:
-		fmt.Println("CheckRabbitMQ WARNING: Object Not Found")
-		os.Exit(1)
+		c.Warning("Object Not Found")
 	}
 }
 
-func alivenessTest(host string, port int, vhost string, user string, password string, timeout int) string {
+func alivenessTest(host string, port int, vhost string, user string, password string, timeout int) (string, error) {
 	var aliveness alivenessStruct
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 
@@ -63,15 +63,18 @@ func alivenessTest(host string, port int, vhost string, user string, password st
 		},
 	}
 	request.SetBasicAuth(user, password)
-	response, err := http.DefaultClient.Do(request)
 
+	response, err := http.DefaultClient.Do(request)
 	if err != nil {
-		fmt.Println("CheckRabbitMQ CRITICAL:", err)
-		os.Exit(2)
+		return "", err
 	}
-	body, _ := ioutil.ReadAll(response.Body)
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
 	defer response.Body.Close()
 
 	json.Unmarshal(body, &aliveness)
-	return aliveness.Status
+	return aliveness.Status, nil
 }

@@ -3,11 +3,10 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"os"
 	"regexp"
 
+	"../sensu-plugin/check"
 	_ "github.com/lib/pq"
-	"github.com/spf13/pflag"
 )
 
 func main() {
@@ -19,35 +18,37 @@ func main() {
 		password string
 	)
 
-	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "P", 5432, "PORT")
-	pflag.StringVarP(&user, "user", "u", "", "USER")
-	pflag.StringVarP(&password, "password", "p", "", "PASSWORD")
-	pflag.StringVarP(&database, "database", "d", "test", "DATABASE")
-	pflag.Parse()
+	c := check.New("CheckPostgres")
+	c.Option.StringVarP(&host, "host", "h", "localhost", "HOST")
+	c.Option.IntVarP(&port, "port", "P", 5432, "PORT")
+	c.Option.StringVarP(&user, "user", "u", "", "USER")
+	c.Option.StringVarP(&password, "password", "p", "", "PASSWORD")
+	c.Option.StringVarP(&database, "database", "d", "test", "DATABASE")
+	c.Init()
 
-	version := selectVersion(host, port, user, password, database)
-	fmt.Println("CheckPostgres OK: Server version", version)
-	os.Exit(0)
+	version, err := selectVersion(host, port, user, password, database)
+	if err != nil {
+		c.Error(err)
+	}
+
+	c.Ok(fmt.Sprint("Server version ", version))
 }
 
-func selectVersion(host string, port int, user string, password string, database string) string {
+func selectVersion(host string, port int, user string, password string, database string) (string, error) {
 	var info string
 
 	source := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, database)
 	db, err := sql.Open("postgres", source)
 	if err != nil {
-		fmt.Println("CheckPostgres CRITICAL:", err)
-		os.Exit(2)
+		return "", err
 	}
 	defer db.Close()
 
 	err = db.QueryRow("select version()").Scan(&info)
 	if err != nil {
-		fmt.Println("CheckPostgres CRITICAL:", err)
-		os.Exit(2)
+		return "", err
 	}
 
 	re := regexp.MustCompile("PostgreSQL ([0-9\\.]+)")
-	return re.FindStringSubmatch(info)[1]
+	return re.FindStringSubmatch(info)[1], nil
 }

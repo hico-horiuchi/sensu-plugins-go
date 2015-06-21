@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
-	"os"
+	"strconv"
 	"time"
 
-	"github.com/spf13/pflag"
+	"../sensu-plugin/check"
 )
 
 func main() {
@@ -16,39 +15,41 @@ func main() {
 		timeout  int
 	)
 
-	pflag.StringVarP(&url, "url", "u", "http://localhost/", "URL")
-	pflag.BoolVarP(&redirect, "redirect", "r", false, "REDIRECT")
-	pflag.IntVarP(&timeout, "timeout", "t", 15, "TIMEOUT")
-	pflag.Parse()
+	c := check.New("CheckHTTP")
+	c.Option.StringVarP(&url, "url", "u", "http://localhost/", "URL")
+	c.Option.BoolVarP(&redirect, "redirect", "r", false, "REDIRECT")
+	c.Option.IntVarP(&timeout, "timeout", "t", 15, "TIMEOUT")
+	c.Init()
 
-	status := statusCode(url, timeout)
+	status, err := statusCode(url, timeout)
+	if err != nil {
+		c.Error(err)
+	}
 
 	switch {
 	case status >= 400:
-		fmt.Printf("CheckHTTP CRITICAL: %d\n", status)
-		os.Exit(2)
+		c.Critical(strconv.Itoa(status))
 	case status >= 300 && redirect:
-		fmt.Printf("CheckHTTP OK: %d\n", status)
-		os.Exit(0)
+		c.Ok(strconv.Itoa(status))
 	case status >= 300:
-		fmt.Printf("CheckHTTP WARNING: %d\n", status)
-		os.Exit(1)
+		c.Warning(strconv.Itoa(status))
 	default:
-		fmt.Printf("CheckHTTP OK: %d\n", status)
-		os.Exit(0)
+		c.Ok(strconv.Itoa(status))
 	}
 }
 
-func statusCode(url string, timeout int) int {
+func statusCode(url string, timeout int) (int, error) {
 	http.DefaultClient.Timeout = time.Duration(timeout) * time.Second
 
-	request, _ := http.NewRequest("GET", url, nil)
-	response, err := http.DefaultTransport.RoundTrip(request)
-
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Println("CheckHTTP CRITICAL:", err)
-		os.Exit(2)
+		return 0, err
 	}
 
-	return response.StatusCode
+	response, err := http.DefaultTransport.RoundTrip(request)
+	if err != nil {
+		return 0, err
+	}
+
+	return response.StatusCode, nil
 }

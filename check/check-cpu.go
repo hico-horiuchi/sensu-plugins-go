@@ -3,12 +3,11 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/spf13/pflag"
+	"../sensu-plugin/check"
 )
 
 func main() {
@@ -18,47 +17,56 @@ func main() {
 		sleep int
 	)
 
-	pflag.IntVarP(&warn, "warn", "w", 80, "WARN")
-	pflag.IntVarP(&crit, "crit", "c", 90, "CRIT")
-	pflag.IntVarP(&sleep, "sleep", "s", 1, "SLEEP")
-	pflag.Parse()
+	c := check.New("CheckCPU")
+	c.Option.IntVarP(&warn, "warn", "w", 80, "WARN")
+	c.Option.IntVarP(&crit, "crit", "c", 90, "CRIT")
+	c.Option.IntVarP(&sleep, "sleep", "s", 1, "SLEEP")
+	c.Init()
 
-	usage := cpuUsage(sleep)
+	usage, err := cpuUsage(sleep)
+	if err != nil {
+		c.Error(err)
+	}
 
 	switch {
 	case usage >= float64(crit):
-		fmt.Printf("CheckCPU CRITICAL: %.0f%%\n", usage)
-		os.Exit(2)
+		c.Critical(fmt.Sprintf("%.0f%%", usage))
 	case usage >= float64(warn):
-		fmt.Printf("CheckCPU WARNING: %.0f%%\n", usage)
-		os.Exit(1)
+		c.Warning(fmt.Sprintf("%.0f%%", usage))
 	default:
-		fmt.Printf("CheckCPU OK: %.0f%%\n", usage)
-		os.Exit(0)
+		c.Ok(fmt.Sprintf("%.0f%%", usage))
 	}
 }
 
-func cpuUsage(sleep int) float64 {
-	beforeStats := getStats()
+func cpuUsage(sleep int) (float64, error) {
+	var usage, totalDiff float64
+
+	beforeStats, err := getStats()
+	if err != nil {
+		return usage, err
+	}
+
 	time.Sleep(time.Duration(sleep) * time.Second)
-	afterStats := getStats()
+
+	afterStats, err := getStats()
+	if err != nil {
+		return usage, err
+	}
 
 	diffStats := make([]float64, len(beforeStats))
-	var totalDiff float64 = 0.0
-
 	for i := range beforeStats {
 		diffStats[i] = afterStats[i] - beforeStats[i]
 		totalDiff += diffStats[i]
 	}
 
-	return 100.0 * (totalDiff - diffStats[3]) / totalDiff
+	usage = 100.0 * (totalDiff - diffStats[3]) / totalDiff
+	return usage, nil
 }
 
-func getStats() []float64 {
+func getStats() ([]float64, error) {
 	contents, err := ioutil.ReadFile("/proc/stat")
 	if err != nil {
-		fmt.Println("CheckCPU CRITICAL:", err)
-		os.Exit(2)
+		return []float64{}, err
 	}
 
 	line := strings.Split(string(contents), "\n")[0]
@@ -66,8 +74,11 @@ func getStats() []float64 {
 
 	result := make([]float64, len(stats))
 	for i := range stats {
-		result[i], _ = strconv.ParseFloat(stats[i], 64)
+		result[i], err = strconv.ParseFloat(stats[i], 64)
+		if err != nil {
+			return result, err
+		}
 	}
 
-	return result
+	return result, nil
 }
