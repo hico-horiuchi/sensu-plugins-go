@@ -1,4 +1,4 @@
-package plugin
+package handler
 
 type EventStruct struct {
 	Client      clientStruct

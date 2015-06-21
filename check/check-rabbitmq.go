@@ -28,10 +28,10 @@ func main() {
 	)
 
 	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "p", 15672, "PORT")
+	pflag.IntVarP(&port, "port", "P", 15672, "PORT")
 	pflag.StringVarP(&vhost, "vhost", "v", "%2F", "VHOST")
 	pflag.StringVarP(&user, "user", "u", "guest", "USER")
-	pflag.StringVarP(&password, "password", "w", "guest", "PASSWORD")
+	pflag.StringVarP(&password, "password", "p", "guest", "PASSWORD")
 	pflag.IntVarP(&timeout, "timeout", "t", 10, "TIMEOUT")
 	pflag.Parse()
 

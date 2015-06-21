@@ -18,8 +18,8 @@ func main() {
 	)
 
 	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "p", 80, "PORT")
-	pflag.Int64VarP(&timeout, "timeout", "T", 1, "TIMEOUT")
+	pflag.IntVarP(&port, "port", "P", 22, "PORT")
+	pflag.Int64VarP(&timeout, "timeout", "t", 5, "TIMEOUT")
 	pflag.Parse()
 
 	address := host + ":" + strconv.Itoa(port)

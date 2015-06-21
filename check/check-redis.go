@@ -20,7 +20,7 @@ func main() {
 	)
 
 	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "p", 6379, "PORT")
+	pflag.IntVarP(&port, "port", "P", 6379, "PORT")
 	pflag.StringVarP(&key, "key", "k", "role", "KEY")
 	pflag.StringVarP(&value, "value", "v", "master", "VALUE")
 	pflag.Parse()

@@ -24,7 +24,7 @@ func main() {
 	)
 
 	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "p", 9200, "PORT")
+	pflag.IntVarP(&port, "port", "P", 9200, "PORT")
 	pflag.IntVarP(&timeout, "timeout", "t", 30, "TIMEOUT")
 	pflag.Parse()
 

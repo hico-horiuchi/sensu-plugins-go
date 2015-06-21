@@ -6,8 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"./sensu/plugin"
-	"github.com/bitly/go-simplejson"
+	"../sensu-plugin/handler"
 )
 
 type metricsStruct struct {
@@ -19,20 +18,20 @@ type metricsStruct struct {
 }
 
 func main() {
-	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-hubot.json")
+	h := handler.New("/etc/sensu/conf.d/h-hubot.json")
 
-	metrics := newMetrics(handler.Event)
+	metrics := newMetrics(h.Event)
 	body, _ := json.Marshal(metrics)
 	payload := strings.NewReader(string(body))
 
-	url := createURL(handler.Config)
+	url := createURL(h.Config)
 	request, _ := http.NewRequest("POST", url, payload)
 	request.Header.Set("Content-Type", "application/json")
 
 	http.DefaultClient.Do(request)
 }
 
-func newMetrics(event plugin.EventStruct) metricsStruct {
+func newMetrics(event handler.EventStruct) metricsStruct {
 	metrics := metricsStruct{}
 
 	metrics.Client = event.Client.Name
@@ -44,7 +43,7 @@ func newMetrics(event plugin.EventStruct) metricsStruct {
 	return metrics
 }
 
-func createURL(config simplejson.Json) string {
+func createURL(config handler.ConfigStruct) string {
 	host := config.GetPath("hubot", "host").MustString()
 	port := config.GetPath("hubot", "port").MustInt()
 	room := config.GetPath("hubot", "room").MustInt()

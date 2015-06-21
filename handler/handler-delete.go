@@ -5,14 +5,14 @@ import (
 	"sort"
 	"strconv"
 
-	"./sensu/plugin"
+	"../sensu-plugin/handler"
 )
 
 func main() {
-	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-delete.json")
-	client := handler.Event.Client
-	check := handler.Event.Check
-	config := handler.Config
+	h := handler.New("/etc/sensu/conf.d/h-delete.json")
+	client := h.Event.Client
+	check := h.Event.Check
+	config := h.Config
 
 	status := config.GetPath("delete", "status").MustInt()
 	contain := contains(client.Subscriptions, config.GetPath("delete", "subscriptions").MustArray())

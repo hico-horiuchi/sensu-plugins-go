@@ -1,23 +1,22 @@
-package plugin
+package handler
 
 import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"os"
-
-	"github.com/bitly/go-simplejson"
 )
 
 type handlerStruct struct {
 	Event  EventStruct
-	Config simplejson.Json
+	Config ConfigStruct
 }
 
-func NewHandler(configPath string) *handlerStruct {
+func New(configPath string) *handlerStruct {
 	handler := &handlerStruct{}
 	handler.readEvent()
 	handler.loadConfig(configPath)
+
 	return handler
 }
 

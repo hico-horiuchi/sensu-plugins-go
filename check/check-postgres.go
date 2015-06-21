@@ -20,9 +20,9 @@ func main() {
 	)
 
 	pflag.StringVarP(&host, "host", "h", "localhost", "HOST")
-	pflag.IntVarP(&port, "port", "p", 5432, "PORT")
+	pflag.IntVarP(&port, "port", "P", 5432, "PORT")
 	pflag.StringVarP(&user, "user", "u", "", "USER")
-	pflag.StringVarP(&password, "password", "w", "", "PASSWORD")
+	pflag.StringVarP(&password, "password", "p", "", "PASSWORD")
 	pflag.StringVarP(&database, "database", "d", "test", "DATABASE")
 	pflag.Parse()
 

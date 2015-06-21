@@ -1,4 +1,4 @@
-package plugin
+package handler
 
 type checkStruct struct {
 	Name        string

@@ -9,8 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"./sensu/plugin"
-	"github.com/bitly/go-simplejson"
+	"../sensu-plugin/handler"
 )
 
 type metricsStruct struct {
@@ -20,15 +19,15 @@ type metricsStruct struct {
 }
 
 func main() {
-	handler := plugin.NewHandler("/etc/sensu/conf.d/handler-elasticsearch.json")
-	lines := strings.Split(strings.TrimRight(handler.Event.Check.Output, "\n"), "\n")
+	h := handler.New("/etc/sensu/conf.d/h-elasticsearch.json")
+	lines := strings.Split(strings.TrimRight(h.Event.Check.Output, "\n"), "\n")
 
 	for _, line := range lines {
 		metrics := newMetrics(line)
 		body, _ := json.Marshal(metrics)
 		payload := strings.NewReader(string(body))
 
-		url := createURL(handler.Event, handler.Config)
+		url := createURL(h.Event, h.Config)
 		request, _ := http.NewRequest("POST", url, payload)
 		request.Header.Set("Content-Type", "application/json")
 
@@ -50,7 +49,7 @@ func newMetrics(line string) metricsStruct {
 	return metrics
 }
 
-func createURL(event plugin.EventStruct, config simplejson.Json) string {
+func createURL(event handler.EventStruct, config handler.ConfigStruct) string {
 	host := config.GetPath("elasticsearch", "host").MustString()
 	port := config.GetPath("elasticsearch", "port").MustInt()
 	now := time.Now().Format("2006.01.02")
