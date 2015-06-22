@@ -19,7 +19,7 @@ type metricsStruct struct {
 }
 
 func main() {
-	h := handler.New("/etc/sensu/conf.d/h-elasticsearch.json")
+	h := handler.New("/etc/sensu/conf.d/handler-elasticsearch.json")
 	lines := strings.Split(strings.TrimRight(h.Event.Check.Output, "\n"), "\n")
 
 	for _, line := range lines {

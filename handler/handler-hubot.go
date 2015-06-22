@@ -18,7 +18,7 @@ type metricsStruct struct {
 }
 
 func main() {
-	h := handler.New("/etc/sensu/conf.d/h-hubot.json")
+	h := handler.New("/etc/sensu/conf.d/handler-hubot.json")
 
 	metrics := newMetrics(h.Event)
 	body, _ := json.Marshal(metrics)

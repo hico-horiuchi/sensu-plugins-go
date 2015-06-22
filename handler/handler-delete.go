@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	h := handler.New("/etc/sensu/conf.d/h-delete.json")
+	h := handler.New("/etc/sensu/conf.d/handler-delete.json")
 	client := h.Event.Client
 	check := h.Event.Check
 	config := h.Config
