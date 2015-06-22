@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -10,58 +9,78 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/pflag"
+	"../lib/metrics"
 )
 
 func main() {
-	var scheme string
-	fqdn, _ := os.Hostname()
-	hostname := strings.Split(fqdn, ".")[0]
+	var sleep int
 
-	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
-	pflag.Parse()
+	m := metrics.New("")
+	m.Option.IntVarP(&sleep, "sleep", "s", 1, "SLEEP")
+	m.Init()
 
-	traffics := trafficsBytes(1)
-	now := time.Now().Unix()
-
-	fmt.Printf("%s.traffic.rx_bytes %d %d\n", scheme, traffics[0], now)
-	fmt.Printf("%s.traffic.tx_bytes %d %d\n", scheme, traffics[1], now)
+	traffics, err := trafficsBytes(1)
+	if err == nil {
+		m.Scheme("traffic.rx_bytes").Print(float64(traffics[0]))
+		m.Scheme("traffic.tx_bytes").Print(float64(traffics[1]))
+	}
 }
 
-func trafficsBytes(sleep int) []int64 {
-	beforeTraffics := getTraffics()
+func trafficsBytes(sleep int) ([]int64, error) {
+	beforeTraffics, err := getTraffics()
+	if err != nil {
+		return []int64{}, err
+	}
+
 	time.Sleep(time.Duration(sleep) * time.Second)
-	afterTraffics := getTraffics()
+
+	afterTraffics, err := getTraffics()
+	if err != nil {
+		return []int64{}, err
+	}
 
 	return []int64{
 		afterTraffics[0] - beforeTraffics[0],
 		afterTraffics[1] - beforeTraffics[1],
-	}
+	}, nil
 }
 
-func getTraffics() []int64 {
+func getTraffics() ([]int64, error) {
 	traffics := make([]int64, 2)
-	ifpaths, _ := filepath.Glob("/sys/class/net/*")
+	ifpaths, err := filepath.Glob("/sys/class/net/*")
+	if err != nil {
+		return []int64{}, err
+	}
 
 	for _, ifpath := range ifpaths {
-		info, _ := os.Stat(ifpath)
+		info, err := os.Stat(ifpath)
+		if err != nil {
+			return []int64{}, err
+		}
 		base := path.Base(ifpath)
 
 		if !info.IsDir() || base == "lo" {
 			continue
 		}
 
-		rxBytes, _ := ioutil.ReadFile(ifpath + "/statistics/rx_bytes")
-		traffics[0] = ParseInt(strings.TrimRight(string(rxBytes), "\n"))
+		rxBytes, err := ioutil.ReadFile(ifpath + "/statistics/rx_bytes")
+		if err != nil {
+			return []int64{}, err
+		}
+		traffics[0], err = strconv.ParseInt(strings.TrimRight(string(rxBytes), "\n"), 10, 64)
+		if err != nil {
+			return []int64{}, err
+		}
 
-		txBytes, _ := ioutil.ReadFile(ifpath + "/statistics/tx_bytes")
-		traffics[1] = ParseInt(strings.TrimRight(string(txBytes), "\n"))
+		txBytes, err := ioutil.ReadFile(ifpath + "/statistics/tx_bytes")
+		if err != nil {
+			return []int64{}, err
+		}
+		traffics[1], err = strconv.ParseInt(strings.TrimRight(string(txBytes), "\n"), 10, 64)
+		if err != nil {
+			return []int64{}, err
+		}
 	}
 
-	return traffics
-}
-
-func ParseInt(s string) int64 {
-	i, _ := strconv.ParseInt(s, 10, 64)
-	return i
+	return traffics, nil
 }

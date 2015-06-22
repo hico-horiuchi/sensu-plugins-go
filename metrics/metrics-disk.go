@@ -1,44 +1,45 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/spf13/pflag"
+	"../lib/metrics"
 )
 
 func main() {
-	var scheme string
-	fqdn, _ := os.Hostname()
-	hostname := strings.Split(fqdn, ".")[0]
+	m := metrics.New("disk.usage")
 
-	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
-	pflag.Parse()
-
-	fmt.Printf("%s.disk.usage %f %d\n", scheme, diskUsage(), time.Now().Unix())
+	usage, err := diskUsage()
+	if err == nil {
+		m.Print(usage)
+	}
 }
 
-func diskUsage() float64 {
-	out, _ := exec.Command("df", "-lP").Output()
+func diskUsage() (float64, error) {
+	out, err := exec.Command("df", "-lP").Output()
+	if err != nil {
+		return 0.0, nil
+	}
 	lines := strings.Split(strings.TrimRight(string(out), "\n"), "\n")[1:]
 
-	var used float64 = 0.0
-	var available float64 = 0.0
-
+	var used, totalUsed, available, totalAvailable float64
 	for _, line := range lines {
 		stats := strings.Fields(line)
-		used += ParseFloat(stats[2])
-		available += ParseFloat(stats[3])
+
+		used, err = strconv.ParseFloat(stats[2], 64)
+		if err != nil {
+			return 0.0, err
+		}
+		totalUsed += used
+
+		available, err = strconv.ParseFloat(stats[3], 64)
+		if err != nil {
+			return 0.0, err
+		}
+		totalAvailable += available
 	}
 
-	return 100.0 * used / (used + available)
-}
-
-func ParseFloat(s string) float64 {
-	f, _ := strconv.ParseFloat(s, 64)
-	return f
+	return 100.0 * totalUsed / (totalUsed + totalAvailable), nil
 }

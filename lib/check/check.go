@@ -8,13 +8,13 @@ import (
 )
 
 type checkStruct struct {
-	Name   string
+	name   string
 	Option *pflag.FlagSet
 }
 
 func New(name string) *checkStruct {
 	check := &checkStruct{
-		Name:   name,
+		name:   name,
 		Option: pflag.NewFlagSet(name, 1),
 	}
 
@@ -26,21 +26,21 @@ func (c checkStruct) Init() {
 }
 
 func (c checkStruct) Ok(output string) {
-	fmt.Println(c.Name, "OK:", output)
+	fmt.Println(c.name, "OK:", output)
 	os.Exit(0)
 }
 
 func (c checkStruct) Warning(output string) {
-	fmt.Println(c.Name, "WARNING:", output)
+	fmt.Println(c.name, "WARNING:", output)
 	os.Exit(1)
 }
 
 func (c checkStruct) Critical(output string) {
-	fmt.Println(c.Name, "CRITICAL:", output)
+	fmt.Println(c.name, "CRITICAL:", output)
 	os.Exit(2)
 }
 
 func (c checkStruct) Error(err error) {
-	fmt.Println(c.Name, "ERROR:", err)
+	fmt.Println(c.name, "ERROR:", err)
 	os.Exit(3)
 }

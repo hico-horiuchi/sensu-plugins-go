@@ -1,33 +1,38 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/spf13/pflag"
+	"../lib/metrics"
 )
 
 func main() {
-	var scheme string
-	fqdn, _ := os.Hostname()
-	hostname := strings.Split(fqdn, ".")[0]
+	m := metrics.New("memory.usage")
 
-	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
-	pflag.Parse()
-
-	fmt.Printf("%s.memory.usage %f %d\n", scheme, memoryUsage(), time.Now().Unix())
+	usage, err := memoryUsage()
+	if err == nil {
+		m.Print(usage)
+	}
 }
 
-func memoryUsage() float64 {
-	out, _ := exec.Command("free").Output()
+func memoryUsage() (float64, error) {
+	out, err := exec.Command("free").Output()
+	if err != nil {
+		return 0.0, err
+	}
 	lines := strings.Split(string(out), "\n")
 
-	total, _ := strconv.ParseFloat(strings.Fields(lines[1])[1], 64)
-	free, _ := strconv.ParseFloat(strings.Fields(lines[2])[3], 64)
+	total, err := strconv.ParseFloat(strings.Fields(lines[1])[1], 64)
+	if err != nil {
+		return 0.0, err
+	}
 
-	return 100.0 - (100.0 * free / total)
+	free, err := strconv.ParseFloat(strings.Fields(lines[2])[3], 64)
+	if err != nil {
+		return 0.0, err
+	}
+
+	return 100.0 - (100.0 * free / total), nil
 }

@@ -1,52 +1,68 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/spf13/pflag"
+	"../lib/metrics"
 )
 
 func main() {
-	var scheme string
-	fqdn, _ := os.Hostname()
-	hostname := strings.Split(fqdn, ".")[0]
+	var sleep int
 
-	pflag.StringVarP(&scheme, "scheme", "s", hostname, "SCHEME")
-	pflag.Parse()
+	m := metrics.New("cpu.usage")
+	m.Option.IntVarP(&sleep, "sleep", "s", 1, "SLEEP")
+	m.Init()
 
-	fmt.Printf("%s.cpu.usage %f %d\n", scheme, cpuUsage(1), time.Now().Unix())
+	usage, err := cpuUsage(sleep)
+	if err == nil {
+		m.Print(usage)
+	}
 }
 
-func cpuUsage(sleep int) float64 {
-	beforeStats := getStats()
+func cpuUsage(sleep int) (float64, error) {
+	var usage, totalDiff float64
+
+	beforeStats, err := getStats()
+	if err != nil {
+		return usage, err
+	}
+
 	time.Sleep(time.Duration(sleep) * time.Second)
-	afterStats := getStats()
+
+	afterStats, err := getStats()
+	if err != nil {
+		return usage, err
+	}
 
 	diffStats := make([]float64, len(beforeStats))
-	var totalDiff float64 = 0.0
-
 	for i := range beforeStats {
 		diffStats[i] = afterStats[i] - beforeStats[i]
 		totalDiff += diffStats[i]
 	}
 
-	return 100.0 * (totalDiff - diffStats[3]) / totalDiff
+	usage = 100.0 * (totalDiff - diffStats[3]) / totalDiff
+	return usage, nil
 }
 
-func getStats() []float64 {
-	contents, _ := ioutil.ReadFile("/proc/stat")
+func getStats() ([]float64, error) {
+	contents, err := ioutil.ReadFile("/proc/stat")
+	if err != nil {
+		return []float64{}, err
+	}
+
 	line := strings.Split(string(contents), "\n")[0]
 	stats := strings.Fields(line)[1:]
 
 	result := make([]float64, len(stats))
 	for i := range stats {
-		result[i], _ = strconv.ParseFloat(stats[i], 64)
+		result[i], err = strconv.ParseFloat(stats[i], 64)
+		if err != nil {
+			return result, err
+		}
 	}
 
-	return result
+	return result, nil
 }
