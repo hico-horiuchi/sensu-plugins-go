@@ -62,10 +62,10 @@ func url(event handler.EventStruct, config handler.ConfigStruct) string {
 	return fmt.Sprintf("http://%s:%d/%s-%s/%s/%x",
 		config.GetPath("elasticsearch", "host").MustString(),
 		config.GetPath("elasticsearch", "port").MustInt(),
-		time.Now().Format("2006.01.02"),
 		config.GetPath("elasticsearch", "index").MustString(),
+		time.Now().Format("2006.01.02"),
 		event.Check.Name,
-		esID,
+		esID(),
 	)
 }
 

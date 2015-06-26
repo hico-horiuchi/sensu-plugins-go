@@ -30,15 +30,13 @@ func main() {
 }
 
 func payload(event handler.EventStruct) string {
-	metrics := metricsStruct{}
-
-	metrics.Client = event.Client.Name
-	metrics.Check = event.Check.Name
-	metrics.Output = strings.TrimRight(event.Check.Output, "\n")
-	metrics.Status = event.Check.Status
-	metrics.Occurrences = event.Occurrences
-
-	body, err := json.Marshal(metrics)
+	body, err := json.Marshal(metricsStruct{
+		Client:      event.Client.Name,
+		Check:       event.Check.Name,
+		Output:      strings.TrimRight(event.Check.Output, "\n"),
+		Status:      event.Check.Status,
+		Occurrences: event.Occurrences,
+	})
 	if err != nil {
 		return ""
 	}

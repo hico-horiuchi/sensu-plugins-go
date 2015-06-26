@@ -7,6 +7,7 @@ import (
 	"os"
 
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/hico-horiuchi/ohgi/sensu"
 )
 
 type handlerStruct struct {
@@ -15,33 +16,11 @@ type handlerStruct struct {
 }
 
 type EventStruct struct {
-	Client      clientStruct
-	Check       checkStruct
-	Occurrences int
-	Action      string
+	sensu.EventStruct
 }
 
 type ConfigStruct struct {
 	simplejson.Json
-}
-
-type clientStruct struct {
-	Name          string
-	Address       string
-	Subscriptions []string
-	Timestamp     int64
-}
-
-type checkStruct struct {
-	Name        string
-	Issued      int
-	Output      string
-	Status      int
-	Command     string
-	Subscribers []string
-	Handler     string
-	History     []string
-	Flapping    bool
 }
 
 func New(path string) *handlerStruct {
