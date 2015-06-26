@@ -20,18 +20,16 @@ type metricsStruct struct {
 func main() {
 	h := handler.New("/etc/sensu/conf.d/handler-hubot.json")
 
-	metrics := newMetrics(h.Event)
-	body, _ := json.Marshal(metrics)
-	payload := strings.NewReader(string(body))
-
-	url := createURL(h.Config)
-	request, _ := http.NewRequest("POST", url, payload)
+	request, err := http.NewRequest("POST", url(h.Config), strings.NewReader(payload(h.Event)))
+	if err != nil {
+		return
+	}
 	request.Header.Set("Content-Type", "application/json")
 
 	http.DefaultClient.Do(request)
 }
 
-func newMetrics(event handler.EventStruct) metricsStruct {
+func payload(event handler.EventStruct) string {
 	metrics := metricsStruct{}
 
 	metrics.Client = event.Client.Name
@@ -40,10 +38,15 @@ func newMetrics(event handler.EventStruct) metricsStruct {
 	metrics.Status = event.Check.Status
 	metrics.Occurrences = event.Occurrences
 
-	return metrics
+	body, err := json.Marshal(metrics)
+	if err != nil {
+		return ""
+	}
+
+	return string(body)
 }
 
-func createURL(config handler.ConfigStruct) string {
+func url(config handler.ConfigStruct) string {
 	host := config.GetPath("hubot", "host").MustString()
 	port := config.GetPath("hubot", "port").MustInt()
 	room := config.GetPath("hubot", "room").MustInt()
