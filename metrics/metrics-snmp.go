@@ -46,7 +46,7 @@ func main() {
 
 			tmp := metrics.New("").Hostname(host)
 			for i := range beforeTraffics[0] {
-				port = strconv.Itoa(i)
+				port = strconv.Itoa(i + 1)
 				tmp.Scheme("snmp.rx_bytes." + port).Print(float64(afterTraffics[0][i] - beforeTraffics[0][i]))
 				tmp.Scheme("snmp.tx_bytes." + port).Print(float64(afterTraffics[1][i] - beforeTraffics[1][i]))
 			}
