@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	h := handler.New("../config/handler-slack.json")
+	h := handler.New("/etc/sensu/conf.d/handler-slack.json")
 	api := slack.New(h.Config.GetPath("slack", "token").MustString())
 
 	api.PostMessage(
@@ -39,13 +39,10 @@ func channelID(api *slack.Client, name string) string {
 }
 
 func attachment(event *handler.EventStruct) *slack.Attachment {
-	output := strings.TrimRight(event.Check.Output, "\n")
-
 	return &slack.Attachment{
 		Color:      color(event.Check.Status),
-		Fallback:   event.Check.Name + " - " + event.Client.Name + " (" + output + ")",
-		Title:      event.Check.Name + " - " + event.Client.Name,
-		Text:       "```\n" + output + "\n```",
+		Fallback:   event.Check.Name + " - " + event.Client.Name + " (" + strings.TrimRight(event.Check.Output, "\n") + ")",
+		Text:       text(event),
 		MarkdownIn: []string{"text"},
 	}
 }
@@ -61,4 +58,15 @@ func color(status int) string {
 	}
 
 	return "#9c9990"
+}
+
+func text(event *handler.EventStruct) string {
+	var str []byte
+
+	str = append(str, ("*Client* : " + event.Client.Name + "\n")...)
+	str = append(str, ("*Address* : " + event.Client.Address + "\n")...)
+	str = append(str, ("*Check* : " + event.Check.Name + "\n")...)
+	str = append(str, ("```\n" + strings.TrimRight(event.Check.Output, "\n") + "\n```")...)
+
+	return string(str)
 }
