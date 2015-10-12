@@ -1,0 +1,12 @@
+{
+  "slack": {
+    "token": "xoxp-01234567890-01234567890-01234567890-abcdefghij",
+    "channel": "#notifications-room"
+  },
+  "handlers": {
+    "slack": {
+      "type": "pipe",
+      "command": "/etc/sensu/handlers/handler-slack"
+    }
+  }
+}

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"time"
 
-	"../lib/check"
+	"github.com/hico-horiuchi/sensu-plugins-go/lib/check"
 )
 
 func main() {

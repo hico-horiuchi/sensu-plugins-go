@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"../lib/check"
+	"github.com/hico-horiuchi/sensu-plugins-go/lib/check"
 	_ "github.com/lib/pq"
 )
 

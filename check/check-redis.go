@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"../lib/check"
 	"github.com/garyburd/redigo/redis"
+	"github.com/hico-horiuchi/sensu-plugins-go/lib/check"
 )
 
 func main() {

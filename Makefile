@@ -16,3 +16,11 @@ build: fmt $(SOURCES)
 
 clean:
 	rm -f bin/*
+
+link:
+	mkdir -p $(GOPATH)/src/github.com/hico-horiuchi
+	ln -s $(CURDIR) $(GOPATH)/src/github.com/hico-horiuchi/sensu-plugins-go
+
+unlink:
+	rm $(GOPATH)/src/github.com/hico-horiuchi/sensu-plugins-go
+	rmdir $(GOPATH)/src/github.com/hico-horiuchi

@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"../lib/handler"
+	"github.com/hico-horiuchi/sensu-plugins-go/lib/handler"
 )
 
 type metricsStruct struct {
@@ -23,7 +23,7 @@ func main() {
 	lines := strings.Split(strings.TrimRight(h.Event.Check.Output, "\n"), "\n")
 
 	for _, line := range lines {
-		request, err := http.NewRequest("POST", url(h.Event, h.Config), strings.NewReader(payload(line)))
+		request, err := http.NewRequest("POST", url(&h.Event, &h.Config), strings.NewReader(payload(line)))
 		if err != nil {
 			continue
 		}
@@ -58,7 +58,7 @@ func payload(line string) string {
 	return string(body)
 }
 
-func url(event handler.EventStruct, config handler.ConfigStruct) string {
+func url(event *handler.EventStruct, config *handler.ConfigStruct) string {
 	return fmt.Sprintf("http://%s:%d/%s-%s/%s/%x",
 		config.GetPath("elasticsearch", "host").MustString(),
 		config.GetPath("elasticsearch", "port").MustInt(),
