@@ -1,45 +1,57 @@
 package main
 
 import (
+	"encoding/json"
+	"net/http"
 	"strings"
 
 	"github.com/hico-horiuchi/sensu-plugins-go/lib/handler"
-	"github.com/nlopes/slack"
 )
+
+type attachmentStruct struct {
+	Color      string   `json:"color"`
+	Fallback   string   `json:"fallback"`
+	Text       string   `json:"text"`
+	MarkdownIn []string `json:"mrkdwn_in"`
+}
+
+type payloadStruct struct {
+	Username    string             `json:"username"`
+	Attachments []attachmentStruct `json:"attachments"`
+	IconURL     string             `json:"icon_url"`
+}
 
 func main() {
 	h := handler.New("/etc/sensu/conf.d/handler-slack.json")
-	api := slack.New(h.Config.GetPath("slack", "token").MustString())
 
-	api.PostMessage(
-		channelID(api, h.Config.GetPath("slack", "channel").MustString()),
-		"",
-		slack.PostMessageParameters{
-			Username:    "Sensu",
-			Attachments: []slack.Attachment{*attachment(&h.Event)},
-			IconURL:     "https://sensuapp.org/img/sensu_flat_logo_large-ce32365a.png",
-		},
+	request, err := http.NewRequest(
+		"POST",
+		h.Config.GetPath("slack", "webhook_url").MustString(),
+		strings.NewReader(payload(&h.Event)),
 	)
+	if err != nil {
+		return
+	}
+	request.Header.Set("Content-Type", "application/json")
+
+	http.DefaultClient.Do(request)
 }
 
-func channelID(api *slack.Client, name string) string {
-	channels, err := api.GetChannels(true)
+func payload(event *handler.EventStruct) string {
+	body, err := json.Marshal(payloadStruct{
+		Username:    "Sensu",
+		Attachments: []attachmentStruct{*attachment(event)},
+		IconURL:     "https://sensuapp.org/img/sensu_flat_logo_large-ce32365a.png",
+	})
 	if err != nil {
 		return ""
 	}
 
-	name = strings.TrimLeft(name, "#")
-	for _, channel := range channels {
-		if channel.Name == name {
-			return channel.ID
-		}
-	}
-
-	return ""
+	return string(body)
 }
 
-func attachment(event *handler.EventStruct) *slack.Attachment {
-	return &slack.Attachment{
+func attachment(event *handler.EventStruct) *attachmentStruct {
+	return &attachmentStruct{
 		Color:      color(event.Check.Status),
 		Fallback:   event.Check.Name + " - " + event.Client.Name + " (" + strings.TrimRight(event.Check.Output, "\n") + ")",
 		Text:       text(event),
