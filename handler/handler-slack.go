@@ -77,6 +77,7 @@ func text(event *handler.EventStruct) string {
 
 	str = append(str, ("*Client* : " + event.Client.Name + "\n")...)
 	str = append(str, ("*Address* : " + event.Client.Address + "\n")...)
+	str = append(str, ("*Subscriptions* : " + strings.Join(event.Client.Subscriptions, ", ") + "\n")...)
 	str = append(str, ("*Check* : " + event.Check.Name + "\n")...)
 	str = append(str, ("```\n" + strings.TrimRight(event.Check.Output, "\n") + "\n```")...)
 
